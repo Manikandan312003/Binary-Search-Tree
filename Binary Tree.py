@@ -33,6 +33,20 @@ class binaryTree:
                 temp = temp.left
                 continue
 
+    def insertRecursive(self,value):
+        temp=self.root
+        def inserting(node,value):
+            if node==None:
+                return Node(value)
+            if value<node.value:
+                node.left=inserting(node.left,value)
+            else:
+                node.right=inserting(node.right,value)
+            return node
+        return inserting(temp,value)
+
+
+
     def inOrderTraverse(self,temp='start'):
         if temp=='start':
             temp=self.root
@@ -43,15 +57,19 @@ class binaryTree:
         print(temp.value,end="-->")
         self.inOrderTraverse(temp.right)
 
-    def preorderTraverse(self,temp='start'):
-        if temp=='start':
-            temp=self.root
-            print("PreOrder Traverse\n")
-        if temp==None:
-            return True
-        print(temp.value,end="-->")
-        self.inOrderTraverse(temp.left)
-        self.inOrderTraverse(temp.right)
+    def preorderTraverse(self):
+        def preorder(node):
+            if node==None:
+                return True
+            print(node.value,end="-->")
+            preorder(node.left)
+            preorder(node.right)
+
+        if self.root is None:
+            return None
+        preorder(self.root)
+
+
 
     def postOrderTraverse(self,temp='start'):
         if temp=='start':
@@ -68,37 +86,43 @@ class binaryTree:
             node=node.left
         return node
 
-    def delete(self,value,temp:Node='start'):
-        if temp=='start':
-            temp=self.root
-        if temp==None:
+    def delete(self,value):
+        if self.root is None:
             return None
-        if temp.value<value:
-            temp.left=self.delete(temp.left,value)
-        elif temp.value>value:
-            temp.right=self.delete(temp.right,value)
-        else:
-            if temp.left==None and temp.right==None:
-                temp.value=None
+        def deleting(node,value):
+            if node==None:
                 return None
-            if temp.left==None:
-                temp=temp.right
-            elif temp.right==None:
-                temp=temp.left
+            if node.value>value:
+                node.left=deleting(node.left,value)
+            elif node.value<value:
+                node.right=deleting(node.right,value)
             else:
-                temp.right=self.delete(temp.right,binaryTree.minimum(temp.right))
-
+                if node.left==None and node.right==None:
+                    node.value=None
+                    return None
+                if node.left==None:
+                    return node.right
+                elif node.right==None:
+                    return node.left
+                else:
+                    rightMin=binaryTree.minimum(node.right).value
+                    node.right=deleting(node.right,rightMin)
+                    node.value=rightMin
+            return node
+        self.root=deleting(self.root,value)
 
 
 def main():
     binary = binaryTree()
     while 1:
         n = int(input("\n1.Insert into Binary-Search-Tree.\t2.Remove From Binary-Search-Tree"
-                      "\n3.PreOrder-Traverse.\t4.Inorder-Traverse.\t5.PostOrder-Traverse\n"))
+                      "\n3.PreOrder-Traverse.\t4.Inorder-Traverse.\t5.PostOrder-Traverse\n"
+                      "6.Multiple Insert\t7.Exit\n"))
         if n == 1:
             binary.insert(int(input("Enter Value to be insert :-")))
         if n == 2:
-            binary.delete(int(input("Enter value:-")))
+            value=int(input("Enter value:-"))
+            binary.delete(value)
         if n==3:
             binary.preorderTraverse()
         if n==4:
@@ -106,9 +130,13 @@ def main():
         if n==5:
             binary.postOrderTraverse()
         if n==6:
+            values=list(map(int,input().split()))
+            for value in values:
+                binary.insert(value)
+
+        if n==7:
             print("'''Opertions Done'''")
             break
-
 
 
 if __name__ == '__main__':
